@@ -1,449 +1,225 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>نظام ركاز المحاسبي - نقاط البيع</title>
-    <style>
-        :root {
-            --primary-color: #0f2027;
-            --secondary-color: #203a43;
-            --accent-color: #2c5364;
-            --gold-color: #d4af37;
-            --light-bg: #f4f6f9;
-            --white: #ffffff;
-            --danger: #e74c3c;
-            --success: #2ecc71;
-        }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ركاز المحاسبي</title>
+  <style>
+    :root { --ink:#0f172a; --navy:#172033; --navy2:#202b43; --gold:#e4ad32; --blue:#2563eb; --green:#12a47c; --red:#dc4c64; --line:#dce3ed; --paper:#f3f5f8; }
+    * { box-sizing:border-box; }
+    body { margin:0; height:100vh; overflow:hidden; font-family:"Segoe UI",Tahoma,sans-serif; background:var(--paper); color:var(--ink); }
+    button,input,select { font-family:inherit; }
+    button { cursor:pointer; }
+    .login { height:100vh; display:flex; align-items:center; justify-content:center; background:radial-gradient(circle at 50% 30%,#263650 0,#111827 58%,#0b1019 100%); }
+    .login-card { width:min(430px,92vw); background:#fff; border-radius:10px; overflow:hidden; box-shadow:0 24px 70px #0008; border:1px solid #ffffff18; }
+    .login-head { background:#182235; color:#fff; text-align:center; padding:22px 20px 18px; border-bottom:4px solid var(--gold); }
+    .login-head h1 { margin:0; color:#f3ba43; font-size:27px; }
+    .login-head p { margin:7px 0 0; color:#cbd5e1; font-size:12px; }
+    .login-body { padding:24px; }
+    .field { margin-bottom:16px; }
+    .field label { display:block; margin-bottom:7px; font-size:13px; font-weight:700; }
+    .field input,.field select { width:100%; height:44px; border:1.5px solid #cbd5e1; border-radius:6px; padding:0 12px; background:#fff; outline:none; }
+    .field input:focus,.field select:focus { border-color:#2563eb; box-shadow:0 0 0 3px #2563eb18; }
+    .login-row { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+    .btn { border:0; border-radius:6px; height:44px; font-weight:800; }
+    .btn-primary { width:100%; background:#1d4ed8; color:#fff; }
+    .btn-primary:hover { background:#1e40af; }
+    .btn-muted { background:#e2e8f0; color:#334155; }
+    .actions-row { display:flex; gap:10px; }
+    .actions-row .btn-muted { width:35%; } .actions-row .btn-primary { width:65%; }
+    .hidden { display:none !important; }
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
+    #admin,#pos { height:100vh; }
+    .topbar { height:64px; background:var(--navy); color:#fff; display:flex; align-items:center; justify-content:space-between; padding:0 18px; border-bottom:3px solid var(--gold); }
+    .brand { display:flex; align-items:center; gap:10px; }
+    .brand-mark { width:38px;height:38px;border-radius:8px;background:var(--gold);color:#172033;display:grid;place-items:center;font-weight:900;font-size:20px; }
+    .brand h1 { margin:0; font-size:18px; color:#f6bc42; }
+    .brand span { display:block;font-size:11px;color:#aeb8c9;margin-top:2px; }
+    .top-info { display:flex;align-items:center;gap:8px;font-size:12px; }
+    .pill { background:#26344d;border:1px solid #344260;border-radius:5px;padding:7px 9px; }
+    .top-btn { height:36px;border:0;border-radius:5px;padding:0 12px;color:#fff;font-weight:700;font-size:12px; }
+    .green { background:#15966f; } .red { background:#bf3e55; } .blue { background:#2563eb; }
 
-        body {
-            background-color: var(--primary-color);
-            color: #333;
-            height: 100vh;
-            overflow: hidden;
-        }
+    .admin-shell { height:calc(100vh - 64px); display:grid; grid-template-columns:230px 1fr; }
+    .sidebar { background:#1d273a;color:#cbd5e1;padding:12px 9px;overflow:auto; }
+    .side-label { padding:5px 8px 9px;color:#7f8aa2;font-size:11px;font-weight:700; }
+    .side-item { padding:10px 9px;border-radius:5px;margin:2px 0;font-size:12px; }
+    .side-item.active { background:#d39c28;color:#fff;font-weight:800; }
+    .admin-main { padding:22px;overflow:auto; }
+    .page-title { font-size:19px;margin:0 0 16px; }
+    .account-form { background:#fff;border:1px solid var(--line);border-radius:7px;padding:12px;display:grid;grid-template-columns:180px 1fr 130px 155px;gap:8px;margin-bottom:12px; }
+    .account-form input,.account-form select { height:38px;border:1px solid #cbd5e1;border-radius:5px;padding:0 9px; }
+    .account-form button { border:0;border-radius:5px;background:#1d4ed8;color:#fff;font-weight:700; }
+    .table-card { background:#fff;border:1px solid var(--line);border-radius:7px;overflow:hidden; }
+    table { width:100%;border-collapse:collapse; }
+    th { background:#26344d;color:#fff;padding:10px;text-align:right;font-size:12px; }
+    td { border-bottom:1px solid #edf0f5;padding:10px;font-size:13px; }
+    tr:last-child td { border-bottom:0; }
 
-        /* شاشة تسجيل الدخول */
-        #login-screen {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            background: linear-gradient(135deg, rgba(15,32,39,0.9), rgba(32,58,67,0.9)), url('94186.jpg') no-repeat center center/cover;
-        }
-
-        .login-card {
-            background: rgba(255, 255, 255, 0.95);
-            padding: 40px;
-            border-radius: 12px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-            width: 400px;
-            text-align: center;
-            border-top: 4px solid var(--gold-color);
-        }
-
-        .login-card h2 {
-            color: var(--primary-color);
-            margin-bottom: 20px;
-            font-size: 24px;
-        }
-
-        .form-group {
-            margin-bottom: 15px;
-            text-align: right;
-        }
-
-        .form-group label {
-            display: block;
-            margin-bottom: 5px;
-            color: #555;
-            font-weight: 600;
-        }
-
-        .form-group input {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 6px;
-            font-size: 16px;
-        }
-
-        .btn-primary {
-            width: 100%;
-            padding: 12px;
-            background: var(--secondary-color);
-            color: var(--white);
-            border: none;
-            border-radius: 6px;
-            font-size: 16px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: background 0.3s;
-        }
-
-        .btn-primary:hover {
-            background: var(--gold-color);
-            color: var(--primary-color);
-        }
-
-        /* واجهة نقطة البيع الأفقية Landscape */
-        #pos-screen {
-            display: none;
-            height: 100vh;
-            grid-template-rows: 60px 1fr 50px;
-            background: var(--light-bg);
-        }
-
-        .pos-header {
-            background: var(--primary-color);
-            color: var(--white);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 0 20px;
-            border-bottom: 2px solid var(--gold-color);
-        }
-
-        .pos-header h1 {
-            font-size: 20px;
-            color: var(--gold-color);
-        }
-
-        .pos-main {
-            display: grid;
-            grid-template-columns: 2fr 1fr;
-            gap: 15px;
-            padding: 15px;
-            height: calc(100vh - 110px);
-        }
-
-        .cart-section {
-            background: var(--white);
-            border-radius: 8px;
-            padding: 15px;
-            display: flex;
-            flex-direction: column;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-        }
-
-        .barcode-input-box {
-            margin-bottom: 15px;
-        }
-
-        .barcode-input-box input {
-            width: 100%;
-            padding: 12px;
-            font-size: 18px;
-            border: 2px solid var(--secondary-color);
-            border-radius: 6px;
-            outline: none;
-        }
-
-        .cart-table-container {
-            flex-grow: 1;
-            overflow-y: auto;
-            border: 1px solid #ddd;
-            border-radius: 6px;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            text-align: center;
-        }
-
-        th, td {
-            padding: 10px;
-            border-bottom: 1px solid #ddd;
-        }
-
-        th {
-            background: var(--secondary-color);
-            color: var(--white);
-            position: sticky;
-            top: 0;
-        }
-
-        .summary-section {
-            background: var(--white);
-            border-radius: 8px;
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-        }
-
-        .summary-box {
-            background: var(--light-bg);
-            padding: 15px;
-            border-radius: 6px;
-            margin-bottom: 15px;
-        }
-
-        .summary-row {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 10px;
-            font-size: 18px;
-            font-weight: bold;
-        }
-
-        .summary-row.net {
-            font-size: 24px;
-            color: var(--danger);
-            border-top: 2px solid #ccc;
-            padding-top: 10px;
-        }
-
-        .action-buttons {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-        }
-
-        .btn-action {
-            padding: 15px;
-            font-size: 16px;
-            font-weight: bold;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            color: var(--white);
-        }
-
-        .btn-checkout { background-color: var(--success); }
-        .btn-hold { background-color: #f39c12; }
-        .btn-delete { background-color: var(--danger); }
-        .btn-new { background-color: var(--secondary-color); grid-column: span 2; }
-
-        .pos-footer {
-            background: var(--secondary-color);
-            color: var(--white);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 0 20px;
-            font-size: 14px;
-        }
-    </style>
+    #pos { background:#edf1f5; }
+    .pos-header { height:58px; background:#172033;color:#fff;display:flex;align-items:center;justify-content:space-between;padding:0 14px;border-bottom:3px solid var(--gold); }
+    .pos-header h1 { margin:0;font-size:18px;color:#efb84a; }
+    .pos-meta { display:flex;align-items:center;gap:8px;font-size:12px; }
+    .pos-body { height:calc(100vh - 58px); display:grid; grid-template-columns:minmax(0,1fr) 340px; }
+    .cart-zone { padding:12px;display:flex;flex-direction:column;min-width:0; }
+    .scan { height:48px;display:flex;align-items:center;border:2px solid #203a62;border-radius:6px;background:#fff;margin-bottom:10px;overflow:hidden; }
+    .scan-icon { width:52px;text-align:center;font-size:22px;color:#64748b; }
+    .scan input { height:100%;flex:1;border:0;outline:0;font-size:16px; }
+    .cart-table { flex:1;overflow:auto;background:#fff;border:1px solid #d4dae4;border-radius:6px; }
+    .cart-table th { background:#26344d;position:sticky;top:0;z-index:1; }
+    .cart-table td { text-align:right; }
+    .cart-table td:first-child,.cart-table th:first-child { width:45px;text-align:center; }
+    .cart-table tr.selected { background:#fff8df;box-shadow:inset 4px 0 0 var(--gold); }
+    .qty-control { display:flex;align-items:center;justify-content:flex-start;gap:5px; }
+    .qty-control button { width:26px;height:26px;border:1px solid #cbd5e1;background:#f8fafc;border-radius:4px;font-weight:800; }
+    .qty-control span { min-width:24px;text-align:center;font-weight:700; }
+    .empty-cart { height:100%;display:grid;place-items:center;color:#94a3b8;font-size:14px; }
+    .right-zone { background:#fff;border-right:1px solid #d7dde7;padding:12px;display:flex;flex-direction:column; }
+    .invoice-head { border-bottom:1px solid #e4e8ef;padding-bottom:8px;margin-bottom:8px;display:flex;justify-content:space-between;font-size:12px;color:#64748b; }
+    .totals { background:#f7f9fc;border:1px solid #e2e7ef;border-radius:7px;padding:10px 12px;margin-bottom:9px; }
+    .total-row { display:flex;justify-content:space-between;padding:5px 0;font-size:14px; }
+    .total-row.net { margin-top:5px;border-top:2px solid #d8dee8;padding-top:10px;font-size:21px;font-weight:900;color:#d9384f; }
+    .payment-grid { display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:9px; }
+    .pay-field label { display:block;font-size:11px;font-weight:800;margin-bottom:4px;color:#64748b; }
+    .pay-field input { width:100%;height:38px;border:1px solid #cbd5e1;border-radius:5px;padding:0 8px; }
+    .customer { margin-bottom:8px; }
+    .customer input { width:100%;height:38px;border:1px solid #cbd5e1;border-radius:5px;padding:0 9px;margin-bottom:6px; }
+    .pay-buttons { display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:auto; }
+    .pay-buttons button { height:52px;border:0;border-radius:6px;color:#fff;font-size:14px;font-weight:900; }
+    .pay-cash { background:#13a37a; } .pay-card { background:#315cba; }
+    .shortcut-strip { height:44px;background:#202b43;color:#dce3ef;display:flex;align-items:center;justify-content:space-between;padding:0 14px;font-size:11px; }
+    kbd { background:#34415b;border:1px solid #526078;border-radius:3px;padding:3px 5px;color:#fff;margin-left:3px; }
+  </style>
 </head>
 <body>
-
-    <!-- شاشة تسجيل الدخول -->
-    <div id="login-screen">
-        <div class="login-card">
-            <h2>نظام ركاز المحاسبي</h2>
-            <form id="loginForm" onsubmit="handleLogin(event)">
-                <div class="form-group">
-                    <label>اسم المستخدم</label>
-                    <input type="text" id="username" required value="admin">
-                </div>
-                <div class="form-group">
-                    <label>كلمة المرور</label>
-                    <input type="password" id="password" required value="1234">
-                </div>
-                <button type="submit" class="btn-primary">تسجيل الدخول</button>
-            </form>
-        </div>
-    </div>
-
-    <!-- شاشة نقاط البيع (Landscape) -->
-    <div id="pos-screen">
-        <div class="pos-header">
-            <h1>ركاز - نقاط البيع (POS)</h1>
-            <div id="user-info">المستخدم: مدير النظام</div>
-        </div>
-
-        <div class="pos-main">
-            <!-- قسم الفاتورة والأصناف -->
-            <div class="cart-section">
-                <div class="barcode-input-box">
-                    <input type="text" id="barcodeInput" placeholder="امسح الباركود هنا أو أدخل كود الصنف ثم اضغط Enter..." autofocus>
-                </div>
-                <div class="cart-table-container">
-                    <table id="cartTable">
-                        <thead>
-                            <tr>
-                                <th>م</th>
-                                <th>اسم الصنف</th>
-                                <th>الوحدة</th>
-                                <th>الكمية</th>
-                                <th>السعر</th>
-                                <th>الإجمالي</th>
-                            </tr>
-                        </thead>
-                        <tbody id="cartBody">
-                            <!-- الأسطر المضافة -->
-                        </tbody>
-                    </table>
-                </div>
+  <section id="login" class="login">
+    <div class="login-card">
+      <div class="login-head"><h1>ركاز المحاسبي (ERP)</h1><p>بوابة الدخول للنظام الإداري ونقاط البيع</p></div>
+      <div class="login-body">
+        <form id="loginForm">
+          <div id="loginStep1">
+            <div class="field"><label>اسم المستخدم</label><input id="username" value="admin" autocomplete="username" required></div>
+            <div class="field"><label>كلمة المرور</label><input id="password" type="password" value="1234" autocomplete="current-password" required></div>
+            <button class="btn btn-primary" type="submit">تحقق وجلب الخيارات الإدارية ←</button>
+          </div>
+          <div id="loginStep2" class="hidden">
+            <div class="field"><label>وجهة الدخول</label><select id="mode"><option value="pos">شاشة نقاط البيع المباشرة (الكاشير POS)</option><option value="admin">النظام الإداري وشجرة الحسابات</option></select></div>
+            <div class="login-row">
+              <div class="field"><label>الفرع</label><select id="branch"><option>المركز الرئيسي - السبعين</option><option>فرع حدة</option></select></div>
+              <div class="field"><label>السنة المالية</label><select id="year"><option>2026</option><option>2025</option></select></div>
             </div>
-
-            <!-- الملخص المالي وأزرار التحكم -->
-            <div class="summary-section">
-                <div class="summary-box">
-                    <div class="summary-row">
-                        <span>المجموع:</span>
-                        <span id="lblSubTotal">0.00</span>
-                    </div>
-                    <div class="summary-row">
-                        <span>الضريبة (15%):</span>
-                        <span id="lblTax">0.00</span>
-                    </div>
-                    <div class="summary-row net">
-                        <span>الصافي المستحق:</span>
-                        <span id="lblNet">0.00</span>
-                    </div>
-                </div>
-
-                <div class="action-buttons">
-                    <button class="btn-action btn-checkout" onclick="checkout()">دفع (F4)</button>
-                    <button class="btn-action btn-hold" onclick="holdInvoice()">تعليق (F6)</button>
-                    <button class="btn-action btn-delete" onclick="deleteItem()">حذف سطر (Del)</button>
-                    <button class="btn-action btn-new" onclick="newInvoice()">فاتورة جديدة (F5)</button>
-                </div>
-            </div>
-        </div>
-
-        <div class="pos-footer">
-            <span>F2: بحث أصناف | F4: سداد | F5: فاتورة جديدة | F6: تعليق | F12: إغلاق الوردية</span>
-            <span id="current-time"></span>
-        </div>
+            <div class="field"><label>الصندوق المالي</label><select id="cashbox"><option>صندوق كاونتر 1 (1101001)</option><option>الخزينة الرئيسية (1101002)</option></select></div>
+            <div class="actions-row"><button type="button" id="backLogin" class="btn btn-muted">رجوع</button><button type="submit" class="btn btn-primary">دخول واعتماد الخيارات</button></div>
+          </div>
+        </form>
+      </div>
     </div>
+  </section>
 
-    <script>
-        let cart = [];
+  <section id="admin" class="hidden">
+    <header class="topbar">
+      <div class="brand"><div class="brand-mark">ر</div><div><h1>ركاز ERP - النظام الإداري</h1><span>نظام إدارة الموارد والمحاسبة</span></div></div>
+      <div class="top-info"><span class="pill" id="adminBranch"></span><span class="pill" id="adminYear"></span><button class="top-btn green" id="openPos">فتح شاشة الكاشير POS</button><button class="top-btn red" onclick="logout()">تسجيل خروج</button></div>
+    </header>
+    <div class="admin-shell">
+      <aside class="sidebar"><div class="side-label">الأنظمة العشرة المترابطة</div><div class="side-item">1. إدارة النظام والصلاحيات</div><div class="side-item active">2. الأستاذ العام وشجرة الحسابات</div><div class="side-item">3. إدارة المخازن والأصناف</div><div class="side-item">4. المشتريات والموردين</div><div class="side-item">5. المبيعات والعملاء</div><div class="side-item">6. نقاط البيع (POS)</div><div class="side-item">7. النقدية والبنوك</div><div class="side-item">8. الأصول الثابتة</div><div class="side-item">9. الموارد البشرية والرواتب</div><div class="side-item">10. التقارير وذكاء الأعمال</div></aside>
+      <main class="admin-main"><h2 class="page-title">شجرة الحسابات (الدليل المحاسبي الهرمي)</h2><form id="accountForm" class="account-form"><input id="accountId" placeholder="رقم الحساب" required><input id="accountName" placeholder="اسم الحساب" required><select id="accountType"><option>تحليلي</option><option>رئيسي</option></select><button>+ إضافة حساب للشجرة</button></form><div class="table-card"><table><thead><tr><th>رقم الحساب</th><th>اسم الحساب</th><th>التصنيف</th><th>الرصيد الافتتاحي</th></tr></thead><tbody id="accountsBody"></tbody></table></div></main>
+    </div>
+  </section>
 
-        // تسجيل الدخول
-        async function handleLogin(e) {
-            e.preventDefault();
-            const username = document.getElementById('username').value;
-            const password = document.getElementById('password').value;
+  <section id="pos" class="hidden">
+    <header class="pos-header">
+      <div class="brand"><div class="brand-mark">ر</div><div><h1>ركاز - نقاط البيع</h1><span>الفترة المالية: <b id="posYear"></b></span></div></div>
+      <div class="pos-meta"><span class="pill" id="posBranch"></span><span class="pill" id="posCashbox"></span><span id="posUser"></span><button class="top-btn blue" id="openAdmin">النظام الإداري</button><button class="top-btn red" onclick="logout()">خروج</button></div>
+    </header>
+    <div class="pos-body">
+      <main class="cart-zone">
+        <div class="scan"><div class="scan-icon">⌕</div><input id="barcode" placeholder="امسح الباركود هنا أو أدخل كود الصنف واضغط Enter..." autocomplete="off"></div>
+        <div class="cart-table"><table><thead><tr><th>م</th><th>اسم الصنف</th><th>الباركود</th><th>الكمية</th><th>السعر</th><th>خصم</th><th>الإجمالي</th></tr></thead><tbody id="cartBody"></tbody></table><div id="emptyCart" class="empty-cart">لا توجد أصناف في الفاتورة الحالية</div></div>
+      </main>
+      <aside class="right-zone">
+        <div class="invoice-head"><span>فاتورة بيع</span><span id="invoiceNo"></span></div>
+        <div class="totals">
+          <div class="total-row"><span>المجموع</span><b id="subtotal">0.00</b></div>
+          <div class="total-row"><span>الخصم</span><b id="discountTotal">0.00</b></div>
+          <div class="total-row"><span>الضريبة 15%</span><b id="tax">0.00</b></div>
+          <div class="total-row net"><span>الصافي المستحق</span><b id="net">0.00</b></div>
+        </div>
+        <div class="payment-grid"><div class="pay-field"><label>نقداً</label><input id="cashPaid" type="number" min="0" value="0"></div><div class="pay-field"><label>بطاقة</label><input id="cardPaid" type="number" min="0" value="0"></div></div>
+        <div class="customer"><input id="customerName" placeholder="اسم العميل"><input id="customerPhone" placeholder="رقم الهاتف"></div>
+        <div class="pay-buttons"><button class="pay-cash" id="cashPay">دفع نقدي <kbd>F4</kbd></button><button class="pay-card" id="cardPay">دفع بطاقة <kbd>F3</kbd></button></div>
+      </aside>
+    </div>
+    <footer class="shortcut-strip"><span><kbd>F1</kbd> بحث <kbd>F2</kbd> حذف سطر <kbd>F4</kbd> دفع <kbd>F5</kbd> إضافة كمية <kbd>F8</kbd> مسح الفاتورة <kbd>F11</kbd> خروج</span><span id="clock"></span></footer>
+  </section>
 
-            try {
-                const response = await fetch('/api/login', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ username, password })
-                });
-                const data = await response.json();
-                if (data.success) {
-                    document.getElementById('login-screen').style.display = 'none';
-                    document.getElementById('pos-screen').style.display = 'grid';
-                    document.getElementById('user-info').innerText = `المستخدم: ${data.user}`;
-                    document.getElementById('barcodeInput').focus();
-                } else {
-                    alert(data.message);
-                }
-            } catch (err) {
-                alert('خطأ في الاتصال بالخادم');
-            }
-        }
-
-        // قراءة الباركود عند الضغط على Enter
-        document.getElementById('barcodeInput').addEventListener('keydown', async function(e) {
-            if (e.key === 'Enter') {
-                const barcode = this.value.trim();
-                if (!barcode) return;
-
-                try {
-                    const res = await fetch(`/api/items/${barcode}`);
-                    if (res.ok) {
-                        const item = await res.json();
-                        addItemToCart(item);
-                        this.value = '';
-                    } else {
-                        alert('الصنف غير مسجل في النظام!');
-                        this.value = '';
-                    }
-                } catch (err) {
-                    console.error(err);
-                }
-            }
-        });
-
-        function addItemToCart(item) {
-            const existing = cart.find(i => i.Barcode === item.Barcode);
-            if (existing) {
-                existing.Qty += 1;
-            } else {
-                cart.push({ ...item, Qty: 1 });
-            }
-            renderCart();
-        }
-
-        function renderCart() {
-            const tbody = document.getElementById('cartBody');
-            tbody.innerHTML = '';
-            let subTotal = 0;
-
-            cart.forEach((item, index) => {
-                const total = item.Qty * item.SalePrice;
-                subTotal += total;
-                tbody.innerHTML += `
-                    <tr>
-                        <td>${index + 1}</td>
-                        <td>${item.ItemName}</td>
-                        <td>${item.Unit}</td>
-                        <td>${item.Qty}</td>
-                        <td>${item.SalePrice.toFixed(2)}</td>
-                        <td>${total.toFixed(2)}</td>
-                    </tr>
-                `;
-            });
-
-            const tax = subTotal * 0.15;
-            const net = subTotal + tax;
-
-            document.getElementById('lblSubTotal').innerText = subTotal.toFixed(2);
-            document.getElementById('lblTax').innerText = tax.toFixed(2);
-            document.getElementById('lblNet').innerText = net.toFixed(2);
-        }
-
-        // اختصارات لوحة المفاتيح
-        window.addEventListener('keydown', function(e) {
-            if (e.key === 'F4') { e.preventDefault(); checkout(); }
-            if (e.key === 'F5') { e.preventDefault(); newInvoice(); }
-            if (e.key === 'F6') { e.preventDefault(); holdInvoice(); }
-        });
-
-        function checkout() {
-            if (cart.length === 0) { alert('السلة فارغة!'); return; }
-            alert('تم إتمام عملية الدفع بنجاح وطباعة الفاتورة!');
-            newInvoice();
-        }
-
-        function newInvoice() {
-            cart = [];
-            renderCart();
-            document.getElementById('barcodeInput').focus();
-        }
-
-        function holdInvoice() {
-            alert('تم تعليق الفاتورة مؤقتاً.');
-            newInvoice();
-        }
-
-        function deleteItem() {
-            if (cart.length > 0) {
-                cart.pop();
-                renderCart();
-            }
-        }
-
-        // تحديث الوقت في الشريط السفلي
-        setInterval(() => {
-            const now = new Date();
-            document.getElementById('current-time').innerText = now.toLocaleDateString('ar-SA') + ' ' + now.toLocaleTimeString();
-        }, 1000);
-    </script>
+  <script>
+    const state={step:1,cart:[],selected:0,session:null,accounts:[
+      {id:'1',name:'الأصول',type:'رئيسي',balance:150000},{id:'11',name:'الأصول المتداولة',type:'رئيسي',balance:150000},{id:'1101001',name:'صندوق كاونتر 1',type:'تحليلي',balance:25000},{id:'1103001',name:'مخزون السوبر ماركت',type:'تحليلي',balance:125000},{id:'4',name:'الإيرادات',type:'رئيسي',balance:85000},{id:'4101001',name:'مبيعات السوبر ماركت النقدية',type:'تحليلي',balance:85000}
+    ]};
+    const $=s=>document.querySelector(s);
+    $('#loginForm').addEventListener('submit',async e=>{
+      e.preventDefault();
+      if(state.step===1){
+        try{const r=await fetch('/api/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username:$('#username').value,password:$('#password').value})});const d=await r.json();if(!d.success){alert(d.message||'بيانات الدخول غير صحيحة');return;}}catch(err){alert('تعذر الاتصال بخادم النظام');return;}
+        state.step=2;$('#loginStep1').classList.add('hidden');$('#loginStep2').classList.remove('hidden');return;
+      }
+      state.session={username:$('#username').value,mode:$('#mode').value,branch:$('#branch').value,year:$('#year').value,cashbox:$('#cashbox').value};
+      enterMode(state.session.mode);
+    });
+    $('#backLogin').onclick=()=>{state.step=1;$('#loginStep2').classList.add('hidden');$('#loginStep1').classList.remove('hidden');};
+    function enterMode(mode){
+      $('#login').classList.add('hidden');
+      if(mode==='admin'){
+        $('#pos').classList.add('hidden');$('#admin').classList.remove('hidden');
+        $('#adminBranch').textContent='الفرع: '+state.session.branch;$('#adminYear').textContent='السنة: '+state.session.year;renderAccounts();
+      }else{
+        $('#admin').classList.add('hidden');$('#pos').classList.remove('hidden');
+        $('#posBranch').textContent=state.session.branch;$('#posYear').textContent=state.session.year;$('#posCashbox').textContent=state.session.cashbox;$('#posUser').textContent='المستخدم: مدير النظام';
+        $('#invoiceNo').textContent='INV-'+new Date().toISOString().slice(0,10).replaceAll('-','')+'-001';setTimeout(()=>$('#barcode').focus(),50);
+      }
+    }
+    $('#openPos').onclick=()=>enterMode('pos');$('#openAdmin').onclick=()=>enterMode('admin');
+    function logout(){state.session=null;state.step=1;$('#pos').classList.add('hidden');$('#admin').classList.add('hidden');$('#login').classList.remove('hidden');$('#loginStep2').classList.add('hidden');$('#loginStep1').classList.remove('hidden');}
+    function renderAccounts(){$('#accountsBody').innerHTML=state.accounts.map(a=>`<tr><td>${a.id}</td><td>${a.name}</td><td>${a.type}</td><td>${a.balance.toLocaleString('ar-SA',{minimumFractionDigits:2})}</td></tr>`).join('');}
+    $('#accountForm').onsubmit=e=>{e.preventDefault();const id=$('#accountId').value.trim(),name=$('#accountName').value.trim();if(id&&name){state.accounts.push({id,name,type:$('#accountType').value,balance:0});renderAccounts();e.target.reset();}};
+    async function scanBarcode(raw){
+      const barcode=raw.trim();if(!barcode)return;
+      try{const r=await fetch('/api/items/'+encodeURIComponent(barcode));if(r.ok){const item=await r.json();addItem({barcode:item.Barcode,name:item.ItemName,price:item.SalePrice,qty:1,discount:0});return;}}catch(e){}
+      const demos={'628100123456':{barcode,name:'حليب طازج كامل الدسم 1 لتر',price:6,qty:1,discount:1},'628100987654':{barcode,name:'جبنة شيدر قابلة للدهن 500 جم',price:18,qty:1,discount:0}};
+      if(demos[barcode])addItem(demos[barcode]);else if(confirm('الصنف غير مسجل. هل تريد إدراج صنف تجريبي؟'))addItem({barcode,name:'صنف تجريبي '+barcode,price:10,qty:1,discount:0});
+    }
+    $('#barcode').addEventListener('keydown',e=>{if(e.key==='Enter'){scanBarcode(e.target.value);e.target.value='';}});
+    function addItem(item){const found=state.cart.find(i=>i.barcode===item.barcode);if(found)found.qty++;else{state.cart.push(item);state.selected=state.cart.length-1;}renderCart();}
+    function renderCart(){
+      $('#emptyCart').classList.toggle('hidden',state.cart.length>0);
+      $('#cartBody').innerHTML=state.cart.map((item,i)=>`<tr class="${i===state.selected?'selected':''}" onclick="state.selected=${i};renderCart()"><td>${i+1}</td><td>${item.name}</td><td>${item.barcode}</td><td><div class="qty-control"><button onclick="event.stopPropagation();changeQty(${i},-1)">−</button><span>${item.qty}</span><button onclick="event.stopPropagation();changeQty(${i},1)">+</button></div></td><td>${item.price.toFixed(2)}</td><td>${item.discount.toFixed(2)}</td><td>${(item.qty*item.price-item.discount).toFixed(2)}</td></tr>`).join('');
+      const subtotal=state.cart.reduce((n,i)=>n+i.qty*i.price,0),discount=state.cart.reduce((n,i)=>n+i.discount,0),tax=(subtotal-discount)*.15,net=subtotal-discount+tax;
+      $('#subtotal').textContent=subtotal.toLocaleString('ar-SA',{minimumFractionDigits:2});$('#discountTotal').textContent=discount.toLocaleString('ar-SA',{minimumFractionDigits:2});$('#tax').textContent=tax.toLocaleString('ar-SA',{minimumFractionDigits:2});$('#net').textContent=net.toLocaleString('ar-SA',{minimumFractionDigits:2});
+    }
+    function changeQty(i,d){state.cart[i].qty=Math.max(1,state.cart[i].qty+d);renderCart();}
+    function removeSelected(){if(state.cart[state.selected]){state.cart.splice(state.selected,1);state.selected=Math.max(0,state.selected-1);}renderCart();}
+    function clearInvoice(){if(state.cart.length&&confirm('هل تريد إلغاء الفاتورة الحالية؟')){state.cart=[];state.selected=0;renderCart();}}
+    async function checkout(kind){
+      if(!state.cart.length){alert('الفاتورة فارغة');return;}
+      const subtotal=state.cart.reduce((n,i)=>n+i.qty*i.price,0);
+      const discount=state.cart.reduce((n,i)=>n+i.discount,0);
+      const net=subtotal-discount+(subtotal-discount)*.15;
+      const invoiceNo=$('#invoiceNo').textContent;
+      if(kind==='cash'){const paid=Number($('#cashPaid').value||0);if(paid<net){alert('المبلغ النقدي المدخل أقل من الصافي المستحق');return;}}
+      try{await fetch('/api/invoices',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({InvoiceNo:invoiceNo,CustomerName:$('#customerName').value||'عميل نقدي',NetPayable:net,Cashier:'مدير النظام'})});}catch(e){}
+      alert('تم إتمام عملية الدفع بنجاح وطباعة الفاتورة');
+      state.cart=[];state.selected=0;$('#cashPaid').value='0';$('#cardPaid').value='0';$('#customerName').value='';$('#customerPhone').value='';renderCart();$('#barcode').focus();
+    }
+    $('#cashPay').onclick=()=>checkout('cash');$('#cardPay').onclick=()=>checkout('card');
+    window.addEventListener('keydown',e=>{
+      if($('#pos').classList.contains('hidden'))return;
+      if(['F1','F2','F3','F4','F5','F8','F11'].includes(e.key))e.preventDefault();
+      if(e.key==='F1')$('#barcode').focus();if(e.key==='F2')removeSelected();if(e.key==='F3')checkout('card');if(e.key==='F4')checkout('cash');
+      if(e.key==='F5')if(state.cart[state.selected]){state.cart[state.selected].qty++;renderCart();}
+      if(e.key==='F8')clearInvoice();if(e.key==='F11')logout();
+    });
+    setInterval(()=>{$('#clock').textContent=new Date().toLocaleDateString('ar-SA')+' '+new Date().toLocaleTimeString('ar-SA');},1000);
+  </script>
 </body>
 </html>

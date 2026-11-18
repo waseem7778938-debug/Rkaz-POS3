@@ -54,6 +54,8 @@ db.serialize(() => {
     // إدخال أصناف تجريبية للتحقق
     db.run(`INSERT OR IGNORE INTO Items (Barcode, ItemName, Unit, SalePrice, StockQty) VALUES ('6281001', 'أرز بسمتي 5 كيلو', 'كيس', 45.00, 100)`);
     db.run(`INSERT OR IGNORE INTO Items (Barcode, ItemName, Unit, SalePrice, StockQty) VALUES ('6281002', 'زيت عافية 1.5 لتر', 'حبة', 18.50, 250)`);
+    db.run(`INSERT OR IGNORE INTO Items (Barcode, ItemName, Unit, SalePrice, StockQty) VALUES ('628100123456', 'حليب طازج كامل الدسم 1 لتر', 'حبة', 6.00, 100)`);
+    db.run(`INSERT OR IGNORE INTO Items (Barcode, ItemName, Unit, SalePrice, StockQty) VALUES ('628100987654', 'جبنة شيدر قابلة للدهن 500 جم', 'حبة', 18.00, 100)`);
 });
 
 // نقطة نهاية تسجيل الدخول
