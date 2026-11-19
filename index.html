@@ -185,9 +185,16 @@
     $('#accountForm').onsubmit=e=>{e.preventDefault();const id=$('#accountId').value.trim(),name=$('#accountName').value.trim();if(id&&name){state.accounts.push({id,name,type:$('#accountType').value,balance:0});renderAccounts();e.target.reset();}};
     async function scanBarcode(raw){
       const barcode=raw.trim();if(!barcode)return;
-      try{const r=await fetch('/api/items/'+encodeURIComponent(barcode));if(r.ok){const item=await r.json();addItem({barcode:item.Barcode,name:item.ItemName,price:item.SalePrice,qty:1,discount:0});return;}}catch(e){}
-      const demos={'628100123456':{barcode,name:'حليب طازج كامل الدسم 1 لتر',price:6,qty:1,discount:1},'628100987654':{barcode,name:'جبنة شيدر قابلة للدهن 500 جم',price:18,qty:1,discount:0}};
-      if(demos[barcode])addItem(demos[barcode]);else if(confirm('الصنف غير مسجل. هل تريد إدراج صنف تجريبي؟'))addItem({barcode,name:'صنف تجريبي '+barcode,price:10,qty:1,discount:0});
+      try{
+        const r=await fetch('/api/items/'+encodeURIComponent(barcode));
+        if(r.ok){
+          const item=await r.json();
+          addItem({barcode:item.Barcode,name:item.ItemName,price:Number(item.SalePrice),qty:1,discount:0});
+          return;
+        }
+        if(r.status===404){alert('الصنف غير مسجل في قاعدة البيانات');return;}
+        alert('تعذر استعلام الصنف من الخادم');
+      }catch(e){alert('تعذر الاتصال بخادم النظام');}
     }
     $('#barcode').addEventListener('keydown',e=>{if(e.key==='Enter'){scanBarcode(e.target.value);e.target.value='';}});
     function addItem(item){const found=state.cart.find(i=>i.barcode===item.barcode);if(found)found.qty++;else{state.cart.push(item);state.selected=state.cart.length-1;}renderCart();}
@@ -204,10 +211,28 @@
       if(!state.cart.length){alert('الفاتورة فارغة');return;}
       const subtotal=state.cart.reduce((n,i)=>n+i.qty*i.price,0);
       const discount=state.cart.reduce((n,i)=>n+i.discount,0);
-      const net=subtotal-discount+(subtotal-discount)*.15;
+      const net=Number((subtotal-discount+(subtotal-discount)*.15).toFixed(2));
       const invoiceNo=$('#invoiceNo').textContent;
-      if(kind==='cash'){const paid=Number($('#cashPaid').value||0);if(paid<net){alert('المبلغ النقدي المدخل أقل من الصافي المستحق');return;}}
-      try{await fetch('/api/invoices',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({InvoiceNo:invoiceNo,CustomerName:$('#customerName').value||'عميل نقدي',NetPayable:net,Cashier:'مدير النظام'})});}catch(e){}
+      if(kind==='cash'){
+        const paid=Number($('#cashPaid').value||0);
+        if(paid<net){alert('المبلغ النقدي المدخل أقل من الصافي المستحق');return;}
+      }else{
+        const paid=Number($('#cardPaid').value||0);
+        if(paid>0 && paid<net){alert('المبلغ المدخل للبطاقة أقل من الصافي المستحق');return;}
+      }
+      let response;
+      try{
+        response=await fetch('/api/invoices',{
+          method:'POST',
+          headers:{'Content-Type':'application/json'},
+          body:JSON.stringify({InvoiceNo:invoiceNo,CustomerName:$('#customerName').value||'عميل نقدي',NetPayable:net,Cashier:'مدير النظام'})
+        });
+      }catch(e){alert('تعذر الاتصال بخادم النظام: لم يتم حفظ الفاتورة');return;}
+      if(!response.ok){
+        const data=await response.json().catch(()=>({message:'تعذر حفظ الفاتورة'}));
+        alert(data.message||'تعذر حفظ الفاتورة');
+        return;
+      }
       alert('تم إتمام عملية الدفع بنجاح وطباعة الفاتورة');
       state.cart=[];state.selected=0;$('#cashPaid').value='0';$('#cardPaid').value='0';$('#customerName').value='';$('#customerPhone').value='';renderCart();$('#barcode').focus();
     }
