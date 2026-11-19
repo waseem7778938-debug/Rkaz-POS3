@@ -61,6 +61,9 @@ db.serialize(() => {
 // نقطة نهاية تسجيل الدخول
 app.post('/api/login', (req, res) => {
     const { username, password } = req.body;
+    if (!username || !password) {
+        return res.status(400).json({ success: false, message: 'يرجى إدخال اسم المستخدم وكلمة المرور' });
+    }
     db.get(`SELECT * FROM Users WHERE Username = ? AND Password = ?`, [username, password], (err, row) => {
         if (err) {
             res.status(500).json({ error: err.message });
@@ -89,6 +92,9 @@ app.get('/api/items/:barcode', (req, res) => {
 // حفظ الفاتورة
 app.post('/api/invoices', (req, res) => {
     const { InvoiceNo, CustomerName, NetPayable, Cashier } = req.body;
+    if (!InvoiceNo || typeof NetPayable !== 'number' || !Number.isFinite(NetPayable) || NetPayable <= 0) {
+        return res.status(400).json({ success: false, message: 'بيانات الفاتورة غير مكتملة أو غير صحيحة' });
+    }
     db.run(`INSERT INTO Invoices (InvoiceNo, CustomerName, NetPayable, Cashier) VALUES (?, ?, ?, ?)`,
         [InvoiceNo, CustomerName, NetPayable, Cashier], function(err) {
             if (err) {
